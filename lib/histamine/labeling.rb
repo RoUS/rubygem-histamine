@@ -27,8 +27,20 @@ module Histamine
   #
   module Labeling
 
+    #
+    # Wildcard for selecting information collected from any & all hosts.
+    #
     MATCH_ANY_HOST	= '*'
+
+    #
+    # Wildcard for selecting information collected from any & all
+    # usernames.
+    #
     MATCH_ANY_USER	= '*'
+
+    #
+    # Wildcard for selecting information regardless of tags assigned.
+    #
     MATCH_ANY_TAG	= [ '*' ]
 
     attr_accessor(:tags)

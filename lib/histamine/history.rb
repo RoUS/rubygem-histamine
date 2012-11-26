@@ -194,6 +194,15 @@ module Histamine
     end
 
     #
+    # If labels are used, the results will be of the
+    # <i><b>intersection</b></i> of their values.  That is, if a
+    # username and a particular tag are specified, only results that
+    # are labeled with *both* that username *and* that tag will be
+    # included.
+    #
+    # @todo
+    #  Strict intersection of tags may not be appropriate; investigate.
+    #
     # @param [Hash] hsh_p
     #  includes options as in Timebucket#dump
     # @return [String]
