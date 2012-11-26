@@ -44,17 +44,10 @@ module Histamine
       if (hsh_p[:commands])
         @commands = [ *hsh_p[:commands] ].flatten.uniq
       end
-      cred = Histamine.identify(hsh_p)
-      @host = cred[:host]
-      @user = cred[:user]
-      @commands ||= []
-    end
-
-    #
-    # @return [String] identity
-    #
-    def identity
-      return @host + ':' + @user
+      cred = Histamine::Labeling.identify(hsh_p)
+      self.host = cred[:host]
+      self.user = cred[:user]
+      self.commands ||= []
     end
 
     #

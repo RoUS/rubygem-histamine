@@ -61,8 +61,8 @@ module Histamine
           results[:host] = host unless (host.empty?)
           results[:user] = user unless (user.empty?)
         end
-        results[:host] = hsh_p[:host].to_s if (hsh_p.key?(:host))
-        results[:user] = hsh_p[:user].to_s if (hsh_p.key?(:user))
+        results[:host] = hsh_p[:hostname] || hsh_p[:host] || MATCH_ANY_HOST
+        results[:user] = hsh_p[:username] || hsh_p[:user] || MATCH_ANY_USER
         results[:identity] = results[:host] + ':' + results[:user]
         return results
       end
@@ -70,9 +70,16 @@ module Histamine
     end                         # eigenclass Labeling
 
     def identify
-      return Histamine::Labeling.identify(:user	=> @user,
-                                          :host	=> @host,
-                                          :tags	=> @tags)
+      return Histamine::Labeling.identify(:user	=> self.user,
+                                          :host	=> self.host,
+                                          :tags	=> self.tags)
+    end
+
+    #
+    # @return [String] identity
+    #
+    def identity
+      return self.host + ':' + self.user
     end
 
   end                           # module Labeling

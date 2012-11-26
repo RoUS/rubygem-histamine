@@ -40,7 +40,7 @@ module Histamine
       # Figure out what the base identity is for this particular
       # History instance.
       #
-      cred = Histamine.identify(hsh_p)
+      cred = self.identify
       @identity = cred[:identity]
       @host = cred[:host]
       @user = cred[:user]
@@ -55,7 +55,7 @@ module Histamine
     # @return [Array]
     #
     def each(*args_p, &block)
-      return @commands.send(:each, *args_p, &block)
+      return @buckets.each(&block)
     end
 
     #
@@ -64,7 +64,7 @@ module Histamine
     #  (see #import)
     #
     def <<(*args_p)
-      result = self.import(:buckets => args_p)
+      result = self.import(:buckets => args_p.flatten.uniq)
     end
 
     #
@@ -104,7 +104,7 @@ module Histamine
     # @return
     #
     def import(hsh_p={})
-      cred = Histamine.identify(hsh_p)
+      cred = self.identify
       if (bkts = hsh_p[:buckets])
         @buckets |= hsh_p[:buckets]
       end
@@ -120,21 +120,23 @@ module Histamine
       end
       return self if (source.nil? || source.empty?)
 
-      #
-      # Add a catch-all bucket for any history commands that don't
-      # have a timestamp.
-      #
-      bucket = Timebucket.new(:time	=> Time.now.localtime,
-                              :identity	=> cred[:identity])
-      @buckets << bucket
-      source.each do |line|
-        if (m = line.match(%r!^\#(\d+)$!))
-          bucket = Timebucket.new(:time		=> m.captures[0].to_i,
-                                  :identity	=> cred[:identity])
-          @buckets << bucket
-          next
+      unless (source.nil?)
+        #
+        # Add a catch-all bucket for any history commands that don't
+        # have a timestamp.
+        #
+        bucket = Timebucket.new(:time		=> Time.now.localtime,
+                                :identity	=> cred[:identity])
+        @buckets << bucket
+        source.each do |line|
+          if (m = line.match(%r!^\#(\d+)$!))
+            bucket = Timebucket.new(:time	=> m.captures[0].to_i,
+                                    :identity	=> cred[:identity])
+            @buckets << bucket
+            next
+          end
+          bucket << line
         end
-        bucket << line
       end
       self.collate!
       self.winnow
@@ -197,7 +199,7 @@ module Histamine
     # @return [String]
     #
     def dump(hsh_p={})
-      cred = Histamine.identify(hsh_p)
+      cred = Histamine::Labeling.identify(hsh_p)
       pp(cred)
       buckets = @buckets.select { |o|
         match = File.fnmatch(cred[:identity], o.identity)
