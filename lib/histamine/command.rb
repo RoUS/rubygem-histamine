@@ -14,28 +14,34 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #++
+
 require('rubygems')
-require('time') unless (Time.new.respond_to?(:iso8601))
-require('pp')
+require('histamine/labeling')
 
-require('ruby-debug')
-Debugger.start
-
-#
-# Module docco
-#
 module Histamine
 
   #
-  # Imports are always holistic; no buckets are omitted regardless of
-  # identity.  Winnowing is restricted to buckets with the same
-  # identities.  Exporting includes all buckets with matching
-  # identities.  Standard glob matching rules apply.
+  # Commands are kept together in buckets, grouped by the time at
+  # which they were saved.  Each bucket also has an identity (host and
+  # username) associated with it.  If no identity is specified when a
+  # bucket is created, the identity used is '*:*'.
   #
+  class Command
+
+    include Histamine::Labeling
+
+    attr_accessor(:text)
+
+    #
+    # @param [String] text
+    # @param [Array<String>] tags
+    # @return [void]
+    #
+    def initialize(text=nil, *tags)
+      @text = text
+      @tags = tags
+    end
+
+  end                           # class Command
 
 end                             # module Histamine
-
-require('histamine/version')
-require('histamine/command')
-require('histamine/bucket')
-require('histamine/history')
